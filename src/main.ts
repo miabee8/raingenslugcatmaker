@@ -1,5 +1,6 @@
 import './style.css'
 import drawCat from './drawCat';
+import { width, height } from "./assets/dimensions.json";
 
 const nameToSpritesname = {
   "SingleColour": 'single',
@@ -21,7 +22,7 @@ const nameToSpritesname = {
   'Calico': '',
 };
 
-const c = new OffscreenCanvas(50, 50);
+const c = new OffscreenCanvas(width, height);
 
 const catSprite = document.getElementById("cat-sprite-img") as HTMLImageElement;
 
@@ -131,7 +132,7 @@ function redrawCat() {
     isDf,
     shading,
   ).then(() => {
-    const finalCanvas = new OffscreenCanvas(50, 50);
+    const finalCanvas = new OffscreenCanvas(width, height);
     const finalCtx = finalCanvas.getContext("2d")!;
 
     finalCtx.fillStyle = backgroundColour;

@@ -12,6 +12,8 @@ import peltInfo from "./assets/peltInfo.json";
 import spritesIndex from "./assets/spritesIndex.json";
 import spriteNumbers from "./assets/spritesOffsetMap.json";
 
+import { width, height } from "./assets/dimensions.json";
+
 function getSpritePosition(spriteName: string, spriteNumber: number) {
   const spriteKey = spriteName as keyof typeof spritesIndex;
   const spriteXPosition = spriteNumbers[spriteNumber].x;
@@ -19,8 +21,9 @@ function getSpritePosition(spriteName: string, spriteNumber: number) {
 
   return {
     url: `sprites/${spritesIndex[spriteKey].spritesheet}.png`,
-    x: spritesIndex[spriteKey].xOffset + 50 * spriteXPosition,
-    y: spritesIndex[spriteKey].yOffset + 50 * spriteYPosition,
+    // divide by size of OG sprite groups, multiply by size of new sprite group
+    x: spritesIndex[spriteKey].xOffset / 150 * (width * 3) + width * spriteXPosition,
+    y: spritesIndex[spriteKey].yOffset / 350 * (height * 7) + height * spriteYPosition,
   };
 }
 
@@ -39,7 +42,7 @@ async function drawSprite(spriteName: string, spriteNumber: number, ctx: any) {
   const spritePosition = getSpritePosition(spriteName, spriteNumber);
 
   const img = await loadImage(spritePosition.url);
-  ctx.drawImage(img, spritePosition.x, spritePosition.y, 50, 50, 0, 0, 50, 50);
+  ctx.drawImage(img, spritePosition.x, spritePosition.y, width, height, 0, 0, width, height);
 }
 
 async function drawTint(
@@ -54,15 +57,15 @@ async function drawTint(
 
   // we only want to tint non-transparent pixels
   // so get version of the tint that's only over those pixels
-  const tintOverlay = new OffscreenCanvas(50, 50);
+  const tintOverlay = new OffscreenCanvas(width, height);
   const tintOverlayContext = tintOverlay.getContext("2d")!;
   tintOverlayContext.drawImage(ctx.canvas, 0, 0);
   tintOverlayContext.globalCompositeOperation = "source-in";
   tintOverlayContext.fillStyle = cssTintColour;
-  tintOverlayContext.fillRect(0, 0, 50, 50);
+  tintOverlayContext.fillRect(0, 0, width, height);
 
   // tinted version of the image required for the next step
-  const tintedLayer = new OffscreenCanvas(50, 50);
+  const tintedLayer = new OffscreenCanvas(width, height);
   const tintedLayerContext = tintedLayer.getContext("2d")!;
   tintedLayerContext.drawImage(ctx.canvas, 0, 0);
   tintedLayerContext.globalCompositeOperation = blendingMode;
@@ -83,7 +86,7 @@ async function drawMaskedSprite(
   spriteNumber: number,
   ctx: any,
 ) {
-  const offscreen = new OffscreenCanvas(50, 50);
+  const offscreen = new OffscreenCanvas(width, height);
   const offscreenContext = offscreen.getContext("2d");
 
   if (offscreenContext !== null) {
@@ -100,7 +103,7 @@ async function drawShading(
   ctx: any
 ) {
 
-  const offscreen = new OffscreenCanvas(50, 50);
+  const offscreen = new OffscreenCanvas(width, height);
   const offscreenContext = offscreen.getContext("2d");
 
   if (offscreenContext === null) {
@@ -134,7 +137,7 @@ async function drawMissingScar(
 
   // "layer" for the lines that go on top
   // have to clip to the canvas to preserve transparency
-  const offscreenCanvas = new OffscreenCanvas(50, 50);
+  const offscreenCanvas = new OffscreenCanvas(width, height);
   const offscreenContext = offscreenCanvas.getContext("2d")!;
   offscreenContext.drawImage(ctx.canvas, 0, 0);
   offscreenContext.globalCompositeOperation = "source-in";
@@ -155,7 +158,7 @@ async function drawCat(
   darkForest = false,
   shading = false,
 ) {
-  const canvas = new OffscreenCanvas(50, 50);
+  const canvas = new OffscreenCanvas(width, height);
   const ctx = canvas.getContext("2d");
   const outCtx = outCanvas.getContext("2d");
 
@@ -199,7 +202,7 @@ async function drawCat(
   }
 
   if (pelt.whitePatches !== undefined) {
-    const offscreen = new OffscreenCanvas(50, 50);
+    const offscreen = new OffscreenCanvas(width, height);
     const offscreenContext = offscreen.getContext("2d");
     await drawSprite(
       `white${pelt.whitePatches}`,
@@ -223,7 +226,7 @@ async function drawCat(
     ctx.drawImage(offscreen, 0, 0);
   }
   if (pelt.points !== undefined) {
-    const offscreen = new OffscreenCanvas(50, 50);
+    const offscreen = new OffscreenCanvas(width, height);
     const offscreenContext = offscreen.getContext("2d");
     await drawSprite(`white${pelt.points}`, catSprite, offscreenContext);
     if (

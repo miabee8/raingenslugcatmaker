@@ -36,6 +36,10 @@ Unlike with ClanGen, even if you're just modifying the JSON files, you have to b
 
 JSON files only affect the _sprite renderer_ (i.e. the code that draws the sprite to the screen). They do not affect the options available on the website. To change the website, you must modify `index.json` and/or `src/main.ts`.
 
+#### dimensions.json
+
+This file specifies the width and height of individual sprites. You must change this if you have a high-res mod.
+
 #### spritesIndex.json:
 
 This file maps sprite group names to their spritesheet file and pixel offset. This allows you to use ClanGen-compatible spritesheets without modification, but it requires some preprocessing if you're adding any new sprites.
